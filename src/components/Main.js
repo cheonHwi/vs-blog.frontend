@@ -15,19 +15,19 @@ const listArr = [
   },
   {
     icon: <VscSearch size={22.4} />,
-    path: "test",
+    path: "tags",
   },
   {
     icon: <VscSourceControl size={22.4} />,
-    path: "test",
+    path: "postingLog",
   },
   {
     icon: <VscDebugAlt size={22.4} />,
-    path: "test",
+    path: "runAndDebug",
   },
   {
     icon: <VscExtensions size={22.4} />,
-    path: "test",
+    path: "extensions",
   },
 ];
 
