@@ -11,44 +11,9 @@ import {
 import Content from "../components/Content";
 import AppContext from "../context/AppContext";
 
-const tempData = [
-  {
-    type: "directory",
-    title: "일상",
-  },
-  {
-    type: "directory",
-    title: "Tech",
-    children: [
-      {
-        type: "post",
-        title: "Tech1",
-      },
-      {
-        type: "post",
-        title: "Tech2",
-      },
-      {
-        type: "directory",
-        title: "Tech3",
-        children: [
-          {
-            type: "post",
-            title: "Tech3",
-          },
-          {
-            type: "post",
-            title: "Tech4",
-          },
-        ],
-      },
-    ],
-  },
-];
-
 function Main() {
   const [selected, setSelected] = useState(null);
-  const { selectedPost } = useContext(AppContext);
+  const { selectedPost, postData, openPost } = useContext(AppContext);
 
   const listArr = [
     {
@@ -60,7 +25,7 @@ function Main() {
             내요요요옹
           </Accordion>
           <Accordion title="VSCODE" isBold={true}>
-            {tempData.map((one, index) => (
+            {postData.map((one, index) => (
               <Content {...one} key={index} />
             ))}
           </Accordion>
@@ -108,7 +73,10 @@ function Main() {
           {listArr[selected].content}
         </LeftContent>
       )}
-      <RightContent>{selectedPost}</RightContent>
+      <RightContent>
+        {JSON.stringify(openPost)}
+        {selectedPost}
+      </RightContent>
     </Wrap>
   );
 }
@@ -122,13 +90,13 @@ const Wrap = styled.div`
 
 const LeftBar = styled.div`
   min-width: 3rem;
-  height: 100%;
+  height: 100vh;
   background-color: #333333;
 `;
 
 const LeftContent = styled.div`
   width: 320px;
-  height: 100%;
+  height: 100vh;
   background-color: #252526;
   padding: 10px;
   > p {
