@@ -37,12 +37,13 @@ const AccordionWrap = styled.div`
   cursor: pointer;
 
   > span {
-    padding-left: 5px;
     user-select: none;
+    padding-left: 5px;
   }
 `;
 
 const AccordionContentWrap = styled.div`
   padding-bottom: 5px;
   padding-left: 15px;
+  user-select: none;
 `;

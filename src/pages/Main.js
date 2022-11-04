@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import styled from "styled-components";
 import Accordion from "../components/Accordion";
 import {
@@ -9,6 +9,7 @@ import {
   VscExtensions,
 } from "react-icons/vsc";
 import Content from "../components/Content";
+import AppContext from "../context/AppContext";
 
 const tempData = [
   {
@@ -37,7 +38,7 @@ const tempData = [
           },
           {
             type: "post",
-            title: "Tech3",
+            title: "Tech4",
           },
         ],
       },
@@ -47,6 +48,7 @@ const tempData = [
 
 function Main() {
   const [selected, setSelected] = useState(null);
+  const { selectedPost } = useContext(AppContext);
 
   const listArr = [
     {
@@ -58,8 +60,8 @@ function Main() {
             내요요요옹
           </Accordion>
           <Accordion title="VSCODE" isBold={true}>
-            {tempData.map((one) => (
-              <Content {...one} />
+            {tempData.map((one, index) => (
+              <Content {...one} key={index} />
             ))}
           </Accordion>
         </>
@@ -92,6 +94,7 @@ function Main() {
             onClick={() => {
               setSelected(index === selected ? null : index);
             }}
+            key={index}
           >
             {one.icon}
           </IconWrap>
@@ -105,6 +108,7 @@ function Main() {
           {listArr[selected].content}
         </LeftContent>
       )}
+      <RightContent>{selectedPost}</RightContent>
     </Wrap>
   );
 }
@@ -114,17 +118,16 @@ export default Main;
 const Wrap = styled.div`
   display: flex;
   height: 100vh;
-  background-color: #fff;
 `;
 
 const LeftBar = styled.div`
-  width: 3rem;
+  min-width: 3rem;
   height: 100%;
   background-color: #333333;
 `;
 
 const LeftContent = styled.div`
-  width: 300px;
+  width: 320px;
   height: 100%;
   background-color: #252526;
   padding: 10px;
@@ -146,4 +149,9 @@ const IconWrap = styled.div`
   > svg {
     color: ${({ selected }) => (selected ? "#FFF" : "#7a7a7a")};
   }
+`;
+
+const RightContent = styled.div`
+  width: 100%;
+  background-color: #1e1e1e;
 `;
