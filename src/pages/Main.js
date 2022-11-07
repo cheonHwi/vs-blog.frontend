@@ -73,10 +73,30 @@ function Main() {
           {listArr[selected].content}
         </LeftContent>
       )}
-      <RightContent>
-        {JSON.stringify(openPost)}
-        {selectedPost}
-      </RightContent>
+      <RightHeader>
+        {openPost.map((one) => {
+          const pathArr = one.split("/").filter(Boolean);
+
+          const data = pathArr.reduce((sum, current, index) => {
+            const lastPath = pathArr.length - 1 === index;
+
+            const target = sum.find(
+              (one) =>
+                one.title === current &&
+                one.type === (lastPath ? "post" : "directory")
+            );
+
+            return lastPath ? target : target?.children;
+          }, postData);
+
+          return (
+            <div className={selectedPost === one ? "selected" : ""}>
+              {data.title}
+            </div>
+          );
+        })}
+      </RightHeader>
+      <RightContent selected={selected}>{selectedPost}</RightContent>
     </Wrap>
   );
 }
@@ -96,6 +116,7 @@ const LeftBar = styled.div`
 
 const LeftContent = styled.div`
   width: 320px;
+  min-width: 320px;
   height: 100vh;
   background-color: #252526;
   padding: 10px;
@@ -103,6 +124,10 @@ const LeftContent = styled.div`
     /* 시계방향 */
     padding-bottom: 10px;
     color: #7a7a7a;
+  }
+
+  @media (max-width: 540px) {
+    width: 100%;
   }
 `;
 
@@ -122,4 +147,29 @@ const IconWrap = styled.div`
 const RightContent = styled.div`
   width: 100%;
   background-color: #1e1e1e;
+
+  @media (max-width: 540px) {
+    display: ${({ selected }) => (selected === null ? "block" : "none")};
+  }
+
+  > div:first-child {
+    display: flex;
+    overflow-x: hidden;
+  }
+`;
+
+const RightHeader = styled.div`
+  width: 100%;
+  height: 50px;
+  display: flex;
+
+  > div {
+    width: 150px;
+    padding: 5px 10px;
+    background-color: #252526;
+
+    &.selected {
+      background-color: #1e1e1e;
+    }
+  }
 `;
