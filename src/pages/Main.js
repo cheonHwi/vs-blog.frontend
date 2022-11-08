@@ -164,10 +164,11 @@ const IconWrap = styled.div`
   padding: 15px 0 15px 0;
   cursor: pointer;
 
-  border-left: ${({ selected }) => (selected ? 2 : 0)}px solid white;
+  border-left: ${({ theme, selected }) =>
+    `${selected ? 2 : 0}px solid ${theme.color.text}`};
 
   > svg {
-    color: ${({ selected }) => (selected ? "#FFF" : "#7a7a7a")};
+    color: ${({ theme, selected }) => `${selected ? "#FFF" : "#7a7a7a"}`};
   }
 `;
 
