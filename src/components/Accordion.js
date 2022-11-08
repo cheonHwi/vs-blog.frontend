@@ -3,8 +3,8 @@ import styled from "styled-components";
 import { VscChevronRight, VscChevronDown } from "react-icons/vsc";
 
 // 객체형 파라미터 구조분해할당
-function Accordion({ title, children, isBold }) {
-  const [expanded, setExpanded] = useState(false);
+function Accordion({ title, children, isBold, initialExpanded }) {
+  const [expanded, setExpanded] = useState(initialExpanded || false);
 
   return (
     <>
