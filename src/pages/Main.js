@@ -1,6 +1,10 @@
 import React, { useContext, useState } from "react";
 import styled from "styled-components";
 import Accordion from "../components/Accordion";
+import Content from "../components/Content";
+import AppContext from "../context/AppContext";
+import { getPostOne } from "../common/common.function";
+import PostWrap from "../components/PostWrap";
 import {
   VscFile,
   VscSearch,
@@ -9,23 +13,26 @@ import {
   VscExtensions,
   VscClose,
 } from "react-icons/vsc";
-import Content from "../components/Content";
-import AppContext from "../context/AppContext";
-import { getPostOne } from "../common/common.function";
-import PostWrap from "../components/PostWrap";
 
 function Main() {
   const [selected, setSelected] = useState(null);
-  const { setSelectedPost, selectedPost, postData, setOpenPost, openPost } =
-    useContext(AppContext);
+  const {
+    theme,
+    setTheme,
+    setSelectedPost,
+    selectedPost,
+    postData,
+    setOpenPost,
+    openPost,
+  } = useContext(AppContext);
 
   const listArr = [
     {
-      icon: <VscFile size={22.4} />,
+      icon: <VscFile size={24} />,
       path: "EXPLORER",
       content: (
         <>
-          <Accordion title="OPEN POSTS" initialExpanded={true} isBold={true}>
+          <Accordion title="OPEN POSTS" isBold={true} initialExpanded={true}>
             {openPost.map((one, index) => {
               const data = getPostOne(postData, one);
 
@@ -35,11 +42,11 @@ function Main() {
                   title={data.title}
                   isClose={true}
                   key={index}
-                ></PostWrap>
+                />
               );
             })}
           </Accordion>
-          <Accordion title="VSCODE" initialExpanded={true} isBold={true}>
+          <Accordion title="VSCODE" isBold={true} initialExpanded={true}>
             {postData.map((one, index) => (
               <Content {...one} key={index} />
             ))}
@@ -48,8 +55,9 @@ function Main() {
       ),
     },
     {
-      icon: <VscSearch size={22.4} />,
+      icon: <VscSearch size={24} />,
       path: "SEARCH",
+      content: <p>111</p>,
     },
     {
       icon: <VscSourceControl size={22.4} />,
@@ -68,28 +76,39 @@ function Main() {
   return (
     <Wrap>
       <LeftBar>
-        {listArr.map((one, index) => (
-          <IconWrap
-            selected={selected === index}
+        <div>
+          {listArr.map((one, index) => (
+            <IconWrap
+              selected={selected === index}
+              onClick={() => {
+                setSelected(selected === index ? null : index);
+              }}
+              key={index}
+            >
+              {one.icon}
+            </IconWrap>
+          ))}
+        </div>
+
+        <div>
+          <div
+            className={theme}
             onClick={() => {
-              setSelected(index === selected ? null : index);
+              setTheme(theme === "dark" ? "light" : "dark");
             }}
-            key={index}
-          >
-            {one.icon}
-          </IconWrap>
-        ))}
+          />
+        </div>
       </LeftBar>
 
       {selected !== null && listArr[selected] && (
         <LeftContent>
-          {/* 옵셔녈 체이닝 */}
           <p>{listArr[selected].path}</p>
           {listArr[selected].content}
         </LeftContent>
       )}
+
       <RightWrap selected={selected}>
-        <RightHeader>
+        <RightHeader visible={openPost.length !== 0 ? true : false}>
           {openPost.map((one, index) => {
             const data = getPostOne(postData, one);
 
@@ -101,7 +120,7 @@ function Main() {
                 }}
                 key={index}
               >
-                📝{data.title}
+                📝 {data.title}
                 <span
                   onClick={(e) => {
                     e.stopPropagation();
@@ -122,7 +141,34 @@ function Main() {
             );
           })}
         </RightHeader>
-        <RightContent>{selectedPost}</RightContent>
+        <RightContent
+          selected={selected}
+          visible={openPost.length !== 0 ? true : false}
+        >
+          {(() => {
+            const data = getPostOne(postData, selectedPost);
+
+            return (
+              data && (
+                <>
+                  <p>{data.path}</p>
+                  <div>
+                    <h1>{data.title}</h1>
+                    <p>
+                      <strong>cheonHwi</strong> | {data.data?.date}
+                    </p>
+                    <div>
+                      {data.data?.tag.map((one, index) => (
+                        <span key={index}>{one}</span>
+                      ))}
+                    </div>
+                    <div>{data.data?.content}</div>
+                  </div>
+                </>
+              )
+            );
+          })()}
+        </RightContent>
       </RightWrap>
     </Wrap>
   );
@@ -130,94 +176,21 @@ function Main() {
 
 export default Main;
 
-const Wrap = styled.div`
-  display: flex;
-  height: 100vh;
-`;
-
-const LeftBar = styled.div`
-  min-width: 50px;
-  height: 100vh;
-  background-color: ${({ theme }) => theme.color.third};
-`;
-
-const LeftContent = styled.div`
-  width: 320px;
-  min-width: 320px;
-  height: 100vh;
-  background-color: ${({ theme }) => theme.color.secondary};
-  padding: 10px;
-  > p {
-    /* 시계방향 */
-    padding-bottom: 10px;
-    color: #7a7a7a;
-  }
+const RightWrap = styled.div`
+  width: ${({ selected }) =>
+    selected === null ? "calc(100% - 50px)" : "calc(100% - 320px - 50px)"};
 
   @media (max-width: 540px) {
-    width: 100%;
-  }
-`;
-
-const IconWrap = styled.div`
-  display: flex;
-  justify-content: center;
-  padding: 15px 0 15px 0;
-  cursor: pointer;
-
-  border-left: ${({ theme, selected }) =>
-    `${selected ? 2 : 0}px solid ${theme.color.text}`};
-
-  > svg {
-    color: ${({ theme, selected }) => `${selected ? "#FFF" : "#7a7a7a"}`};
-  }
-`;
-
-const RightContent = styled.div`
-  width: 100%;
-  height: calc(100% - 50px);
-  /* background-color: #1e1e1e; */
-  background-color: ${({ theme }) => theme.color.primary};
-
-  > div:first-child {
-    display: flex;
-    overflow-x: hidden;
+    display: ${({ selected }) => (selected === null ? "block" : "none")};
   }
 `;
 
 const RightHeader = styled.div`
   width: 100%;
   height: 50px;
-  line-height: 25px;
-  display: flex;
+  display: ${({ visible }) => (visible ? "flex" : "none")};
   overflow-x: scroll;
   background-color: ${({ theme }) => theme.color.secondary};
-
-  > div {
-    width: 150px;
-    padding: 5px 10px;
-    background-color: ${({ theme }) => theme.color.secondary};
-    position: relative;
-
-    &.selected {
-      background-color: ${({ theme }) => theme.color.primary};
-      ${({ theme }) => theme.color.primary}
-    }
-
-    &:hover > span {
-      display: block;
-    }
-
-    &:not(.selected) > span {
-      display: none;
-    }
-
-    > span {
-      position: absolute;
-      right: 5px;
-      top: 7px;
-      cursor: pointer;
-    }
-  }
 
   ::-webkit-scrollbar-thumb {
     display: none;
@@ -226,13 +199,153 @@ const RightHeader = styled.div`
   &:hover::-webkit-scrollbar-thumb {
     display: block;
   }
+
+  > div {
+    width: 150px;
+    min-width: 150px;
+    padding: 10px;
+    background-color: ${({ theme }) => theme.color.secondary};
+    position: relative;
+    cursor: pointer;
+
+    &.selected {
+      background-color: ${({ theme }) => theme.color.primary};
+    }
+
+    &:not(.selected) > span {
+      display: none;
+    }
+
+    &:hover > span {
+      display: block;
+    }
+
+    > span {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+    }
+  }
 `;
 
-const RightWrap = styled.div`
-  width: ${({ selected }) =>
-    selected === null ? "calc(100% - 50px);" : "calc(100% - 320px - 50px);"};
+const RightContent = styled.div`
+  width: 100%;
+  height: ${({ visible }) => (visible ? "calc(100% - 50px)" : "100%")};
+  background-color: ${({ theme }) => theme.color.primary};
+  padding: 10px 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  > p {
+    width: 100%;
+    color: #7a7a7a;
+  }
+
+  > div {
+    width: 100%;
+    max-width: 600px;
+    > h1 {
+      padding: 30px 0 10px 0;
+    }
+
+    > p {
+      padding-bottom: 20px;
+      margin-bottom: 10px;
+      color: #7a7a7a;
+      border-bottom: 1px solid ${({ theme }) => theme.color.selected};
+    }
+
+    > div:nth-child(3) {
+      padding: 10px 0 20px 0;
+      > span {
+        padding: 5px 10px;
+        margin-right: 10px;
+        border-radius: 10px;
+        background-color: ${({ theme }) => theme.color.selected};
+      }
+    }
+  }
+`;
+
+const IconWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+  cursor: pointer;
+
+  border-left: ${({ theme, selected }) =>
+    `${selected ? 2 : 0}px solid ${theme.color.text}`};
+
+  > svg {
+    color: ${({ theme, selected }) =>
+      selected ? theme.color.text : "#7a7a7a"};
+  }
+`;
+
+const Wrap = styled.div`
+  display: flex;
+  height: 100vh;
+`;
+
+const LeftBar = styled.div`
+  width: 50px;
+  min-width: 50px;
+  height: 100%;
+  background-color: ${({ theme }) => theme.color.third};
+
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+
+  > div:last-child {
+    padding-bottom: 30px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    > div {
+      height: 50px;
+      width: 30px;
+      /* background: ${({ theme }) => theme.color.primary}; */
+      background: red;
+      border-radius: 50px;
+      position: relative;
+      cursor: pointer;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 6px;
+        left: 5px;
+        width: 20px;
+        height: 20px;
+        border-radius: 20px;
+        /* background-color: ${({ theme }) => theme.color.selected}; */
+        background-color: orange;
+        transition: 0.3s;
+      }
+      &.light::after {
+        top: 25px;
+      }
+    }
+  }
+`;
+
+const LeftContent = styled.div`
+  width: 320px;
+  min-width: 320px;
+  height: 100%;
+  background-color: ${({ theme }) => theme.color.secondary};
+  padding: 10px;
+
+  > p {
+    padding-bottom: 10px;
+    color: #7a7a7a;
+  }
 
   @media (max-width: 540px) {
-    display: ${({ selected }) => (selected === null ? "block" : "none")};
+    width: 100%;
   }
 `;

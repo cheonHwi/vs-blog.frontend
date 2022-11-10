@@ -1,17 +1,19 @@
 import React, { useContext } from "react";
 import styled from "styled-components";
-import { VscClose } from "react-icons/vsc";
 import AppContext from "../context/AppContext";
 
 function PostWrap({ path, title, isClose }) {
-  const { setSelectedPost, selectedPost, openPost, setOpenPost } =
+  const { selectedPost, setSelectedPost, openPost, setOpenPost } =
     useContext(AppContext);
 
   function selectedFunction() {
     setSelectedPost(path);
 
-    if (!openPost.includes(path)) setOpenPost([...openPost, path]);
+    if (!openPost.includes(path)) {
+      setOpenPost([...openPost, path]);
+    }
   }
+
   return (
     <PostWrapStyled
       onClick={selectedFunction}
@@ -30,7 +32,7 @@ function PostWrap({ path, title, isClose }) {
           );
         }}
       >
-        <VscClose />
+        &#215;
       </span>
       &nbsp;&nbsp;&nbsp;&nbsp;📝{title}
     </PostWrapStyled>
@@ -47,16 +49,21 @@ const PostWrapStyled = styled.div`
   &:not(.selected):hover {
     background-color: ${({ theme }) => theme.color.hover};
   }
+
   &.selected {
     background-color: ${({ theme }) => theme.color.selected};
   }
+
   &:hover > span {
     display: block;
   }
+
   > span {
-    top: 5px;
     position: absolute;
+    left: 5px;
+    top: 4px;
     display: none;
+
     &.visible {
       display: block;
     }

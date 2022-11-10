@@ -4,13 +4,15 @@ import AppContext from "../context/AppContext";
 import Accordion from "./Accordion";
 
 function Content({ type, title, children, path }) {
-  const { setSelectedPost, selectedPost, openPost, setOpenPost } =
+  const { selectedPost, setSelectedPost, openPost, setOpenPost } =
     useContext(AppContext);
 
   function selectedFunction() {
     setSelectedPost(path);
 
-    if (!openPost.includes(path)) setOpenPost([...openPost, path]);
+    if (!openPost.includes(path)) {
+      setOpenPost([...openPost, path]);
+    }
   }
 
   return type === "directory" ? (
@@ -28,15 +30,16 @@ function Content({ type, title, children, path }) {
     </PostWrap>
   );
 }
-
 export default Content;
 
 const PostWrap = styled.div`
   padding: 5px 0;
   cursor: pointer;
-  &:hover {
+
+  &:not(.selected):hover {
     background-color: ${({ theme }) => theme.color.hover};
   }
+
   &.selected {
     background-color: ${({ theme }) => theme.color.selected};
   }

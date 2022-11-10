@@ -8,7 +8,7 @@ import Main from "./pages/Main";
 import AppContext from "./context/AppContext";
 import { useEffect, useState } from "react";
 import { ThemeProvider } from "styled-components";
-import { darkTheme } from "./style/theme";
+import { darkTheme, lightTheme } from "./style/theme";
 import { GlobalStyle } from "./style/GlobalStyle";
 
 const router = createBrowserRouter(
@@ -24,6 +24,7 @@ function App() {
   const [selectedPost, setSelectedPost] = useState("");
   const [postData, setPostData] = useState([]);
   const [openPost, setOpenPost] = useState([]);
+  const [theme, setTheme] = useState("dark");
 
   useEffect(() => {
     setPostData([
@@ -39,6 +40,11 @@ function App() {
             type: "post",
             title: "Tech1",
             path: "/Tech/Tech1",
+            data: {
+              date: "2022.11.09",
+              tag: ["기술", "리뷰"],
+              content: "내요오오오오옹옹",
+            },
           },
           {
             type: "post",
@@ -61,17 +67,32 @@ function App() {
               },
             ],
           },
+          {
+            type: "post",
+            title: "Tech3",
+            path: "/Tech/Tech3",
+          },
         ],
       },
     ]);
   }, []);
 
   return (
-    //  전역적으로 사용하는 변수, 함수들을 value에 정의한다.
     <AppContext.Provider
-      value={{ selectedPost, setSelectedPost, postData, openPost, setOpenPost }}
+      value={{
+        selectedPost,
+        setSelectedPost,
+
+        openPost,
+        setOpenPost,
+
+        postData,
+
+        theme,
+        setTheme,
+      }}
     >
-      <ThemeProvider theme={darkTheme}>
+      <ThemeProvider theme={theme === "dark" ? darkTheme : lightTheme}>
         <GlobalStyle />
         <RouterProvider router={router} />
       </ThemeProvider>
