@@ -14,6 +14,7 @@ export const GlobalStyle = createGlobalStyle`
 
 *::-webkit-scrollbar {
   height: 7px; /* 스크롤바의 너비 */
+  width: 7px;
 }
 
 *::-webkit-scrollbar-thumb {

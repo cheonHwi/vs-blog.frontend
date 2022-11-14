@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { ThemeProvider } from "styled-components";
 import { darkTheme, lightTheme } from "./style/theme";
 import { GlobalStyle } from "./style/GlobalStyle";
+import axios from "axios";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -22,59 +23,20 @@ const router = createBrowserRouter(
 
 function App() {
   const [selectedPost, setSelectedPost] = useState("");
+  const [selectedTag, setSelectedTag] = useState(null);
   const [postData, setPostData] = useState([]);
   const [openPost, setOpenPost] = useState([]);
   const [theme, setTheme] = useState("dark");
 
   useEffect(() => {
-    setPostData([
-      {
-        type: "directory",
-        title: "일상",
-      },
-      {
-        type: "directory",
-        title: "Tech",
-        children: [
-          {
-            type: "post",
-            title: "Tech1",
-            path: "/Tech/Tech1",
-            data: {
-              date: "2022.11.09",
-              tag: ["기술", "리뷰"],
-              content: "내요오오오오옹옹",
-            },
-          },
-          {
-            type: "post",
-            title: "Tech2",
-            path: "/Tech/Tech2",
-          },
-          {
-            type: "directory",
-            title: "Tech3",
-            children: [
-              {
-                type: "post",
-                title: "Tech31",
-                path: "/Tech/Tech3/Tech31",
-              },
-              {
-                type: "post",
-                title: "Tech32",
-                path: "/Tech/Tech3/Tech32",
-              },
-            ],
-          },
-          {
-            type: "post",
-            title: "Tech3",
-            path: "/Tech/Tech3",
-          },
-        ],
-      },
-    ]);
+    async function fetch() {
+      const { data: responsePostdata } = await axios.get(
+        "http://localhost:3005/post/all"
+      );
+      setPostData(responsePostdata);
+      console.log(responsePostdata);
+    }
+    fetch();
   }, []);
 
   return (
@@ -82,6 +44,9 @@ function App() {
       value={{
         selectedPost,
         setSelectedPost,
+
+        selectedTag,
+        setSelectedTag,
 
         openPost,
         setOpenPost,

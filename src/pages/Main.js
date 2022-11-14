@@ -13,6 +13,11 @@ import {
   VscExtensions,
   VscClose,
 } from "react-icons/vsc";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import Search from "./Search";
 
 function Main() {
   const [selected, setSelected] = useState(null);
@@ -57,7 +62,7 @@ function Main() {
     {
       icon: <VscSearch size={24} />,
       path: "SEARCH",
-      content: <p>111</p>,
+      content: <Search />,
     },
     {
       icon: <VscSourceControl size={22.4} />,
@@ -72,6 +77,8 @@ function Main() {
       path: "EXTENSIONS",
     },
   ];
+
+  const data = getPostOne(postData, selectedPost);
 
   return (
     <Wrap>
@@ -145,29 +152,45 @@ function Main() {
           selected={selected}
           visible={openPost.length !== 0 ? true : false}
         >
-          {(() => {
-            const data = getPostOne(postData, selectedPost);
-
-            return (
-              data && (
-                <>
-                  <p>{data.path}</p>
-                  <div>
-                    <h1>{data.title}</h1>
-                    <p>
-                      <strong>cheonHwi</strong> | {data.data?.date}
-                    </p>
-                    <div>
-                      {data.data?.tag.map((one, index) => (
-                        <span key={index}>{one}</span>
-                      ))}
-                    </div>
-                    <div>{data.data?.content}</div>
-                  </div>
-                </>
-              )
-            );
-          })()}
+          {data &&
+            (<>
+              <p>{data.path}</p>
+              <div>
+                <h1>{data.title}</h1>
+                <p>
+                  <strong>cheonHwi</strong> | {data.data?.date}
+                </p>
+                <div>
+                  {data.data?.tag?.map((one, index) => (
+                    <span key={index}>{one}</span>
+                  ))}
+                </div>
+                <div>
+                  <ReactMarkdown
+                    children={data.data?.content}
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      code({ node, inline, className, children, ...props }) {
+                        const match = /language-(\w+)/.exec(className || "");
+                        return !inline && match ? (
+                          <SyntaxHighlighter
+                            children={String(children).replace(/\n$/, "")}
+                            style={oneDark}
+                            language={match[1]}
+                            PreTag="div"
+                            {...props}
+                          />
+                        ) : (
+                          <code className={className} {...props}>
+                            {children}
+                          </code>
+                        );
+                      },
+                    }}
+                  ></ReactMarkdown>
+                </div>
+              </div>
+            </>)()}
         </RightContent>
       </RightWrap>
     </Wrap>
@@ -233,6 +256,7 @@ const RightContent = styled.div`
   height: ${({ visible }) => (visible ? "calc(100% - 50px)" : "100%")};
   background-color: ${({ theme }) => theme.color.primary};
   padding: 10px 20px;
+  overflow-y: scroll;
 
   display: flex;
   flex-direction: column;
@@ -264,6 +288,12 @@ const RightContent = styled.div`
         margin-right: 10px;
         border-radius: 10px;
         background-color: ${({ theme }) => theme.color.selected};
+      }
+    }
+
+    > div:last-child.markdown {
+      h1 {
+        color: pink;
       }
     }
   }
