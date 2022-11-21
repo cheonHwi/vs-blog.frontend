@@ -34,11 +34,14 @@ function Search() {
 
             if (tempTarget) {
               tempTarget.count += 1;
+              tempTarget.postArr.push(nowPostData.path);
+
+              tempTarget.postArr = [...new Set(tempTarget.postArr1)];
             } else {
               tempArr.push({
-                tagTitle: "Tech",
-                count: 3,
-                postArray: [],
+                tagTitle: tag,
+                count: 1,
+                postArr: [nowPostData.path],
               });
             }
           });
@@ -57,7 +60,10 @@ function Search() {
           <Tag
             key={index}
             onClick={() => {
-              setSelectedTag(one.tagTitle);
+              setSelectedTag({
+                tagTitle: one.tagTitle,
+                path: one.postArr,
+              });
             }}
           >
             {one.tagTitle} <span> {one.count}</span>
@@ -81,7 +87,7 @@ const Tag = styled.div`
   border-radius: 10px;
   background-color: ${({ theme }) => theme.color.third};
   cursor: pointer;
-  k &:hover {
+  &:hover {
     background-color: ${({ theme }) => theme.color.hover};
   }
 

@@ -34,7 +34,6 @@ function App() {
         "http://localhost:3005/post/all"
       );
       setPostData(responsePostdata);
-      console.log(responsePostdata);
     }
     fetch();
   }, []);

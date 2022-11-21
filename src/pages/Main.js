@@ -26,9 +26,11 @@ function Main() {
     setTheme,
     setSelectedPost,
     selectedPost,
+    selectedTag,
     postData,
     setOpenPost,
     openPost,
+    setSelectedTag,
   } = useContext(AppContext);
 
   const listArr = [
@@ -115,83 +117,138 @@ function Main() {
       )}
 
       <RightWrap selected={selected}>
-        <RightHeader visible={openPost.length !== 0 ? true : false}>
-          {openPost.map((one, index) => {
-            const data = getPostOne(postData, one);
-
-            return (
-              <div
-                className={selectedPost === one ? "selected" : ""}
-                onClick={() => {
-                  setSelectedPost(data.path);
-                }}
-                key={index}
-              >
-                📝 {data.title}
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation();
-
-                    const openPostFilter = openPost.filter(
-                      (one) => one !== data.path
-                    );
-                    setOpenPost(openPostFilter);
-
-                    setSelectedPost(
-                      openPostFilter.length !== 0 ? openPostFilter[0] : null
-                    );
-                  }}
-                >
-                  <VscClose />
-                </span>
-              </div>
-            );
-          })}
-        </RightHeader>
-        <RightContent
-          selected={selected}
-          visible={openPost.length !== 0 ? true : false}
-        >
-          {data &&
-            (<>
-              <p>{data.path}</p>
+        {selectedTag ? (
+          <RightTagContent>
+            <div>
+              <h2>
+                {selectedTag.tagTitle} 관련 글 목록{" "}
+                <span>({selectedTag.path.length} 개)</span>
+              </h2>
               <div>
-                <h1>{data.title}</h1>
-                <p>
-                  <strong>cheonHwi</strong> | {data.data?.date}
-                </p>
-                <div>
-                  {data.data?.tag?.map((one, index) => (
-                    <span key={index}>{one}</span>
-                  ))}
-                </div>
-                <div>
-                  <ReactMarkdown
-                    children={data.data?.content}
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                      code({ node, inline, className, children, ...props }) {
-                        const match = /language-(\w+)/.exec(className || "");
-                        return !inline && match ? (
-                          <SyntaxHighlighter
-                            children={String(children).replace(/\n$/, "")}
-                            style={oneDark}
-                            language={match[1]}
-                            PreTag="div"
-                            {...props}
-                          />
-                        ) : (
-                          <code className={className} {...props}>
-                            {children}
-                          </code>
-                        );
-                      },
-                    }}
-                  ></ReactMarkdown>
-                </div>
+                {selectedTag.path.map((path) => {
+                  const tagData = getPostOne(postData, path);
+
+                  return (
+                    <div
+                      className="post"
+                      onClick={() => {
+                        setSelectedPost(tagData.path);
+                        setSelectedTag(null);
+
+                        if (!openPost.includes(path)) {
+                          setOpenPost([...openPost, path]);
+                        }
+                      }}
+                    >
+                      <div>
+                        <div>
+                          {tagData.data.thumbnail && (
+                            <img src={tagData.data.thumbnail} alt="" />
+                          )}
+                        </div>
+                        <h3>{tagData.title}</h3>
+                      </div>
+                      <div>
+                        {tagData.data.tag.map((one) => (
+                          <span>{one}</span>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            </>)()}
-        </RightContent>
+            </div>
+          </RightTagContent>
+        ) : (
+          <>
+            <RightHeader visible={openPost.length !== 0 ? true : false}>
+              {openPost.map((one, index) => {
+                const data = getPostOne(postData, one);
+
+                return (
+                  <div
+                    className={selectedPost === one ? "selected" : ""}
+                    onClick={() => {
+                      setSelectedPost(data.path);
+                    }}
+                    key={index}
+                  >
+                    📝 {data.title}
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+
+                        const openPostFilter = openPost.filter(
+                          (one) => one !== data.path
+                        );
+                        setOpenPost(openPostFilter);
+
+                        setSelectedPost(
+                          openPostFilter.length !== 0 ? openPostFilter[0] : null
+                        );
+                      }}
+                    >
+                      <VscClose />
+                    </span>
+                  </div>
+                );
+              })}
+            </RightHeader>
+            <RightContent
+              selected={selected}
+              visible={openPost.length !== 0 ? true : false}
+            >
+              {data && (
+                <>
+                  <p>{data.path}</p>
+                  <div>
+                    <h1>{data.title}</h1>
+                    <p>
+                      <strong>cheonHwi</strong> | {data.data?.date}
+                    </p>
+                    <div>
+                      {data.data?.tag?.map((one, index) => (
+                        <span key={index}>{one}</span>
+                      ))}
+                    </div>
+                    <div>
+                      <ReactMarkdown
+                        children={data.data?.content}
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          code({
+                            node,
+                            inline,
+                            className,
+                            children,
+                            ...props
+                          }) {
+                            const match = /language-(\w+)/.exec(
+                              className || ""
+                            );
+                            return !inline && match ? (
+                              <SyntaxHighlighter
+                                children={String(children).replace(/\n$/, "")}
+                                style={oneDark}
+                                language={match[1]}
+                                PreTag="div"
+                                {...props}
+                              />
+                            ) : (
+                              <code className={className} {...props}>
+                                {children}
+                              </code>
+                            );
+                          },
+                        }}
+                      ></ReactMarkdown>
+                    </div>
+                  </div>
+                </>
+              )}
+            </RightContent>
+          </>
+        )}
       </RightWrap>
     </Wrap>
   );
@@ -247,6 +304,77 @@ const RightHeader = styled.div`
       position: absolute;
       right: 15px;
       top: 10px;
+    }
+  }
+`;
+
+const RightTagContent = styled.div`
+  width: 100%;
+  height: 100%;
+  background-color: ${({ theme }) => theme.color.primary};
+  padding: 10px 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  overflow-y: scroll;
+  > div {
+    width: 100%;
+    max-width: 600px;
+    > h2 {
+      border-bottom: 1px solid #505050;
+      padding: 30px 0 20px 0;
+
+      > span {
+        font-size: 0.8rem;
+        color: ${({ theme }) => theme.color.selected};
+      }
+    }
+
+    > div {
+      > div.post {
+        padding: 10px;
+        margin-top: 20px;
+        border-radius: 10px;
+        background: ${({ theme }) => theme.color.secondary};
+        cursor: pointer;
+
+        &:hover {
+          background: ${({ theme }) => theme.color.third};
+          transform: scale(1.05);
+          transition: 0.2s;
+        }
+
+        > div:first-child {
+          display: flex;
+          > div {
+            width: 80px;
+            height: 80px;
+            background-color: red;
+            border-radius: 10px;
+            overflow: hidden;
+            > img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+          }
+          > h3 {
+            padding-left: 10px;
+          }
+        }
+        > div:last-child {
+          margin-top: 10px;
+          > span {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 10px;
+            margin-right: 10px;
+            background-color: ${({ theme }) => theme.color.selected};
+          }
+        }
+      }
     }
   }
 `;

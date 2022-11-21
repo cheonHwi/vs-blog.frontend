@@ -16,6 +16,6 @@ export default React.createContext({
   theme: "",
   setTheme: () => {},
 
-  selectedTag: "",
+  selectedTag: null,
   setSelectedTag: () => {},
 });
